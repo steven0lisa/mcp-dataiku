@@ -1,6 +1,6 @@
 {
   "name": "@zhangzichao2008/mcp-dataiku",
-  "version": "1.0.3",
+  "version": "1.0.7",
   "description": "MCP Server for Dataiku DSS integration",
   "type": "module",
   "main": "dist/mcp-server.js",

@@ -479,6 +479,15 @@ export class DataikuMcpServer {
                   type: 'string',
                   description: 'Optional filter by dataset type',
                 },
+                search: {
+                  type: 'string',
+                  description: 'Optional search keyword to filter datasets by name',
+                },
+                simple: {
+                  type: 'boolean',
+                  description: 'Whether to return only simplified dataset information (name, projectKey, type)',
+                  default: false,
+                },
               },
               required: ['project_key'],
             },
@@ -537,6 +546,15 @@ export class DataikuMcpServer {
                 recipe_type: {
                   type: 'string',
                   description: 'Optional filter by recipe type',
+                },
+                search: {
+                  type: 'string',
+                  description: 'Optional search keyword to filter recipes by name',
+                },
+                simple: {
+                  type: 'boolean',
+                  description: 'Whether to return only simplified recipe information (name, projectKey, type)',
+                  default: false,
                 },
               },
               required: ['project_key'],
@@ -1095,7 +1113,26 @@ export class DataikuMcpServer {
 
           // Additional Dataset Tools
           case 'list_datasets':
-            result = await this.client.listDatasets(String(args.project_key));
+            let datasets = await this.client.listDatasets(String(args.project_key));
+
+            // Apply search filter if provided
+            if (args.search) {
+              const searchTerm = String(args.search).toLowerCase();
+              datasets = datasets.filter((dataset: any) =>
+                dataset.name?.toLowerCase().includes(searchTerm)
+              );
+            }
+
+            // Apply simple mode if requested
+            if (args.simple) {
+              datasets = datasets.map((dataset: any) => ({
+                name: dataset.name,
+                projectKey: dataset.projectKey,
+                type: dataset.type,
+              }));
+            }
+
+            result = datasets;
             break;
 
           case 'get_dataset_info':
@@ -1108,7 +1145,26 @@ export class DataikuMcpServer {
 
           // Additional Recipe Tools
           case 'list_recipes':
-            result = await this.client.listRecipes(String(args.project_key));
+            let recipes = await this.client.listRecipes(String(args.project_key));
+
+            // Apply search filter if provided
+            if (args.search) {
+              const searchTerm = String(args.search).toLowerCase();
+              recipes = recipes.filter((recipe: any) =>
+                recipe.name?.toLowerCase().includes(searchTerm)
+              );
+            }
+
+            // Apply simple mode if requested
+            if (args.simple) {
+              recipes = recipes.map((recipe: any) => ({
+                name: recipe.name,
+                projectKey: recipe.projectKey,
+                type: recipe.type,
+              }));
+            }
+
+            result = recipes;
             break;
 
           case 'get_recipe_info':
